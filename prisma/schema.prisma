@@ -19,7 +19,35 @@ model User{
   email       String @unique
   password    String
   phonenumber String
+  address     String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  pesan       Pesan[]
 }
+model Product{
+  id          Int @id @default(autoincrement())
+  name        String
+  price       Float
+  image       String
+  category    Category @relation(fields:[categoryId],references:[id])
+  categoryId  Int
+}
+model Category{
+  id          Int @id @default(autoincrement())
+  name        String @unique
+  products    Product[]
+}
+
+model Pesan {
+  id          Int      @id @default(autoincrement())
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      Int?     
+  guestName   String?  
+  guestPhone  String?  
+  totalPrice  Float    
+  status      String   @default("Pending") // Status pesanan: Pending, Diproses, Selesai, Dibatalkan
+  createdAt   DateTime @default(now())
+
+}
+
 

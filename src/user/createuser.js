@@ -7,9 +7,9 @@ const router = express.Router();
 router.post("/", async (req, res) => {
     try {
         //ambil field data user dari body
-        const { name, email, password, phonenumber } = req.body;
+        const { name, email, password, phonenumber,address } = req.body;
         //jika smeua  field kosong 
-        if (!name || !email || !password || !phonenumber) {
+        if (!name || !email || !password || !phonenumber|| !address) {
             return res.status(400).json({ message: "Semua field wajib diisi" });
         }
 
@@ -32,6 +32,7 @@ router.post("/", async (req, res) => {
                 email,
                 password: hashedPassword,
                 phonenumber,
+                address
             },
         });
 
