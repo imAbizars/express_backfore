@@ -1,12 +1,12 @@
 const prisma = require("../db");
-
+const path = require("path");
 // Insert product 
 const insertproduct = async (productData) => {
     return await prisma.product.create({
         data: {
             name: productData.name,
             price: parseFloat(productData.price),
-            image: `/uploads/${productData.image}`,
+            image: productData.image?path.basename(productData.image) : null,
             categoryId: productData.categoryId, 
         },
         include: { category: true },

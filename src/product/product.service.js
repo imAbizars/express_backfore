@@ -15,7 +15,7 @@ const createProduct = async (newProductData) => {
 
     if (!category) {
         throw new Error("Kategori tidak ditemukan");
-    }
+    };
 
     const productData = {
         ...newProductData,
@@ -42,7 +42,7 @@ const getproductbyId = async (id) => {
     const product = await findproductbyId(id);
     if (!product) {
         throw new Error("Produk tidak ditemukan");
-    }
+    };
     return {
         id: product.id,
         name: product.name,
@@ -58,7 +58,7 @@ const updateProductById = async (id, updateData) => {
     const product = await findproductbyId(id);
     if (!product) {
         throw new Error("Produk tidak ditemukan");
-    }
+    };
 
     if (updateData.category) {
         const category = await prisma.category.findUnique({
@@ -69,7 +69,7 @@ const updateProductById = async (id, updateData) => {
         }
         updateData.categoryId = category.id;
         delete updateData.category;
-    }
+    };
 
     return await updateproduct(id, updateData);
 };
@@ -80,7 +80,8 @@ const deleteproductbyId = async (id) => {
     const product = await findproductbyId(id);
     if (!product) {
         throw new Error("Produk tidak ditemukan");
-    }
+    };
+    
     await deleteproduct(id);
 };
 

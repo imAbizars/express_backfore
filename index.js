@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 const createUser = require("./src/user/createuser");
 const productController = require("./src/product/product.controller");
+const pesanController = require("./src/pesan/pesan.controller");
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT ;
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 app.use("/register", createUser);
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use("/products",productController);
+app.use("/pesan",pesanController);
 
 app.listen(PORT, () => {
     console.log("Server berjalan di port " + PORT);

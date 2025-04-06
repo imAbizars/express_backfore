@@ -24,6 +24,7 @@ model User{
   updatedAt   DateTime @updatedAt
   pesan       Pesan[]
 }
+
 model Product{
   id          Int @id @default(autoincrement())
   name        String
@@ -31,7 +32,9 @@ model Product{
   image       String
   category    Category @relation(fields:[categoryId],references:[id])
   categoryId  Int
+  pesanDetails PesanDetail[]
 }
+
 model Category{
   id          Int @id @default(autoincrement())
   name        String @unique
@@ -39,15 +42,26 @@ model Category{
 }
 
 model Pesan {
-  id          Int      @id @default(autoincrement())
-  user        User?    @relation(fields: [userId], references: [id])
-  userId      Int?     
-  guestName   String?  
-  guestPhone  String?  
-  totalPrice  Float    
-  status      String   @default("Pending") // Status pesanan: Pending, Diproses, Selesai, Dibatalkan
-  createdAt   DateTime @default(now())
-
+  id          Int            @id @default(autoincrement())
+  user        User?          @relation(fields: [userId], references: [id])
+  userId      Int?           
+  guestName   String?        
+  guestPhone  String?        
+  totalPrice  Float          
+  status      String         @default("Pending")
+  createdAt   DateTime       @default(now())
+  details     PesanDetail[]  // Relasi ke detail pesanan
 }
+
+model PesanDetail {
+  id        Int     @id @default(autoincrement())
+  pesan     Pesan   @relation(fields: [pesanId], references: [id])
+  pesanId   Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  qty       Int
+  price     Float // Simpan harga saat dipesan
+}
+
 
 
