@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { 
-  buatPesanan
+  buatPesanan,
+  ambilPesanan
  } = require("./pesan.service");
-
+//post
 router.post("/", async (req, res) => {
   try {
     const pesanData = req.body;
@@ -26,5 +27,16 @@ router.post("/", async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+//get
+router.get("/",async(req,res)=>{
+  try{
+    const pesanan = await ambilPesanan();
+    res.status(201).json(pesanan);
+  }catch(error){
+    res.status(400).json({
+      message:error.message
+    })
+  }
+})
 
 module.exports = router;

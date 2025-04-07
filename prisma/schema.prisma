@@ -46,7 +46,8 @@ model Pesan {
   user        User?          @relation(fields: [userId], references: [id])
   userId      Int?           
   guestName   String?        
-  guestPhone  String?        
+  guestPhone  String?
+  address     String         
   totalPrice  Float          
   status      String         @default("Pending")
   createdAt   DateTime       @default(now())

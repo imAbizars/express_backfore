@@ -1,4 +1,9 @@
 const prisma = require("../db");
+const {
+  createPesan,
+  getallpesan
+} = require("./pesan.repository");
+
 
 const buatPesanan = async (data) => {
   const { userId, guestName, guestPhone, details } = data;
@@ -7,17 +12,17 @@ const buatPesanan = async (data) => {
     throw new Error("Detail pesanan wajib diisi.");
   }
 
-  // Ambil semua productId unik
+  // productId 
   const productIds = details.map(item => item.productId);
 
-  // Ambil harga dari DB
+  // harga dari DB
   const products = await prisma.product.findMany({
     where: {
       id: { in: productIds }
     }
   });
 
-  // Buat map untuk cepat akses price by productId
+  // map akses price by productId
   const priceMap = {};
   products.forEach(p => {
     priceMap[p.id] = p.price;
@@ -40,25 +45,32 @@ const buatPesanan = async (data) => {
       price
     };
   });
+  const pesanan = await createPesan({userId,guestName,guestPhone,detailItems,totalPrice});
+  return pesanan;
 
-  const pesan = await prisma.pesan.create({
-    data: {
-      userId: userId || null,
-      guestName,
-      guestPhone,
-      totalPrice,
-      details: {
-        create: detailData
-      }
-    },
-    include: {
-      details: true
-    }
-  });
-
-  return pesan;
 };
+const ambilPesanan= async()=>{
+  const data = await getallpesan();
+  const formatted = data.map(pesan => ({
+    id: pesan.id,
+    userId: pesan.userId,
+    guestName: pesan.guestName,
+    guestPhone: pesan.guestPhone,
+    totalPrice: pesan.totalPrice,
+    status: pesan.status,
+    createdAt: pesan.createdAt,
+    details: pesan.details.map(detail => ({
+      productId: detail.productId,
+      qty: detail.qty,
+      price: detail.price,
+      product: detail.product?.name || "Produk tidak ditemukan"
+    }))
+  }));
+
+  return formatted;
+}
 
 module.exports = {
-  buatPesanan
+  buatPesanan,
+  ambilPesanan,
 };
