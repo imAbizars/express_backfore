@@ -1,28 +1,29 @@
 const prisma = require("../db");
 const {
   createPesan,
-  getallpesan
+  getallpesan,
+  getpesanbyId,
+  updateStatusPesan
 } = require("./pesan.repository");
 
 
 const buatPesanan = async (data) => {
-  const { userId, guestName, guestPhone, details } = data;
+  const { userId, guestName, guestPhone, address: guestAddress, details } = data;
 
   if (!details || !Array.isArray(details) || details.length === 0) {
     throw new Error("Detail pesanan wajib diisi.");
   }
 
-  // productId 
+  // Ambil semua productId unik
   const productIds = details.map(item => item.productId);
 
-  // harga dari DB
+  // Ambil harga dari DB
   const products = await prisma.product.findMany({
     where: {
       id: { in: productIds }
     }
   });
 
-  // map akses price by productId
   const priceMap = {};
   products.forEach(p => {
     priceMap[p.id] = p.price;
@@ -30,14 +31,13 @@ const buatPesanan = async (data) => {
 
   let totalPrice = 0;
 
-  const detailData = details.map(item => {
+  const detailItems = details.map(item => {
     const price = priceMap[item.productId];
     if (price === undefined) {
       throw new Error(`Produk dengan ID ${item.productId} tidak ditemukan`);
     }
 
-    const itemTotal = price * item.qty;
-    totalPrice += itemTotal;
+    totalPrice += price * item.qty;
 
     return {
       productId: item.productId,
@@ -45,17 +45,39 @@ const buatPesanan = async (data) => {
       price
     };
   });
-  const pesanan = await createPesan({userId,guestName,guestPhone,detailItems,totalPrice});
-  return pesanan;
 
+  // ✅ Ambil address dari user jika ada userId
+  let finalAddress = guestAddress;
+  if (userId) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { address: true }
+    });
+    if (!user) throw new Error("User tidak ditemukan.");
+    finalAddress = user.address;
+  }
+
+  const pesan = await createPesan({
+    userId,
+    guestName,
+    guestPhone,
+    address: finalAddress,
+    totalPrice,
+    detailItems
+  });
+
+  return pesan;
 };
-const ambilPesanan= async()=>{
+
+const tampilPesanan = async()=>{
   const data = await getallpesan();
   const formatted = data.map(pesan => ({
     id: pesan.id,
     userId: pesan.userId,
+    userName : pesan.user?.name,
     guestName: pesan.guestName,
     guestPhone: pesan.guestPhone,
+    address : pesan.address,
     totalPrice: pesan.totalPrice,
     status: pesan.status,
     createdAt: pesan.createdAt,
@@ -68,9 +90,44 @@ const ambilPesanan= async()=>{
   }));
 
   return formatted;
-}
+};
 
+const tampilPesananById = async (id) => {
+  const pesan = await getpesanbyId(id);
+
+  if (!pesan) throw new Error("Pesanan tidak ditemukan");
+
+  return {
+    id: pesan.id,
+    userId: pesan.userId,
+    userName: pesan.user?.name,
+    guestName: pesan.guestName,
+    guestPhone: pesan.guestPhone,
+    address: pesan.address,
+    totalPrice: pesan.totalPrice,
+    status: pesan.status,
+    createdAt: pesan.createdAt,
+    details: pesan.details?.map(detail => ({
+      productId: detail.productId,
+      qty: detail.qty,
+      price: detail.price,
+      product: detail.product?.name || "Produk tidak ditemukan"
+    }))
+  };
+};
+
+const ubahStatusPesanan = async (id, status) => {
+  const statusValid = ["Pending", "Diproses", "Dikirim"];
+  if (!statusValid.includes(status)) {
+    throw new Error("Status tidak valid.");
+  }
+
+  const updated = await updateStatusPesan(id, status);
+  return updated;
+};
 module.exports = {
   buatPesanan,
-  ambilPesanan,
+  tampilPesanan,
+  tampilPesananById,
+  ubahStatusPesanan
 };

@@ -1,10 +1,10 @@
-const express = require("express");
-const bcrypt = require("bcrypt");
-const prisma = require("../db");
-
+const express = require('express');
+const prisma = require('../../db');
+const bcrypt = require('bcrypt');
 const router = express.Router();
+const { loginUser } = require('./auth.service');
 
-router.post("/", async (req, res) => {
+router.post("/register", async (req, res) => {
     try {
         //ambil field data user dari body
         const { name, email, password, phonenumber,address } = req.body;
@@ -41,6 +41,40 @@ router.post("/", async (req, res) => {
         console.error(error);
         res.status(500).json({ message: "Terjadi kesalahan pada server" });
     }
+});
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await loginUser(email, password);
+
+    // Simpan ke session
+    req.session.user = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+
+    res.json({ message: "Login berhasil", user: req.session.user });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+router.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(400).json({ message: "Logout gagal" });
+    }
+    res.json({ message: "Logout berhasil" });
+  });
+});
+
+router.get("/me", (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ message: "Belum login" });
+  }
+  res.json({ user: req.session.user });
 });
 
 module.exports = router;

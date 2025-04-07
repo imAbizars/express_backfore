@@ -12,24 +12,62 @@ const createPesan = async ({ userId, guestName, guestPhone,address, totalPrice, 
         create: detailItems
       }
     },
-    include: {
-      details: true
-    }
   });
 };
+
 const getallpesan = async()=>{
   const pesanan = await prisma.pesan.findMany({
     include:{
+      user:{
+        select:{
+          name:true
+        }
+      },
       details:{
         include:{
           product:true
         }
       }
+    },
+    orderBy:{
+      createdAt:"desc"
     }
   });
-  return pesanan
-}
+  return pesanan;
+};
+const getpesanbyId = async(id)=>{
+  return await prisma.pesan.findUnique({
+    where:{
+      id
+    },
+    include:{
+      user:{
+        select: {
+          name: true
+        }
+      },
+      details: {
+        include: {
+          product: true
+        }
+      }
+    }
+  });
+};
+const updateStatusPesan = async(id,status)=>{
+  const statuspesan = await prisma.pesan.update({
+    where:{
+      id,
+    },
+    data:{
+      status,
+    }
+  });
+  return statuspesan;
+};
 module.exports = {
   createPesan,
-  getallpesan
+  getallpesan,
+  updateStatusPesan,
+  getpesanbyId
 };
