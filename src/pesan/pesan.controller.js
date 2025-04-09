@@ -6,6 +6,7 @@ const {
   tampilPesananById,
   ubahStatusPesanan
  } = require("./pesan.service");
+const { isAdmin } = require("../../middleware/auth");
 //post
 
 router.post("/", async (req, res) => {
@@ -69,7 +70,7 @@ router.get("/:id",async(req,res)=>{
     })
   }
 })
-router.patch("/:id/status", async (req, res) => {
+router.patch("/:id/status",isAdmin, async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { status } = req.body;

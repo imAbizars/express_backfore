@@ -23,6 +23,7 @@ const {
     deleteproductbyId,
     updateProductById
 } = require("./product.service");
+const { isAdmin } = require("../../middleware/auth");
 
 const router = express.Router();
 
@@ -48,7 +49,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // POST new product
-router.post("/", upload.single("image"), async (req, res) => {
+router.post("/",isAdmin, upload.single("image"), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: "No image uploaded" });
@@ -69,7 +70,7 @@ router.post("/", upload.single("image"), async (req, res) => {
     }
 });
 // PATCH product
-router.patch("/:id", upload.single("image"), async (req, res) => {
+router.patch("/:id",isAdmin,upload.single("image"), async (req, res) => {
     const productId = parseInt(req.params.id);
 
     try {
