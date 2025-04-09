@@ -25,6 +25,9 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     maxAge: 1000 * 60 * 60, // 1 jam
+    secure: false,          // HARUS false saat di localhost (karena HTTP)
+    httpOnly: true,
+    sameSite: 'Lax', 
   }
 }));
 
