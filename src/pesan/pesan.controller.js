@@ -70,7 +70,7 @@ router.get("/:id",async(req,res)=>{
     })
   }
 })
-router.patch("/:id/status",isAdmin, async (req, res) => {
+router.patch("/:id/status", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { status } = req.body;
