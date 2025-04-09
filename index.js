@@ -14,7 +14,7 @@ const PORT = process.env.PORT;
 
 // Middleware
 app.use(cors({
-  origin: "*", // Ganti sesuai domain frontend kamu
+  origin: "http://localhost:5173", 
   credentials: true
 }));
 app.use(express.json());
