@@ -1,6 +1,6 @@
 const prisma = require("../db");
 
-export const getAllCategories = async(req,res)=>{
+const getAllCategories = async(req,res)=>{
     try{
         const categories = await prisma.category.findMany();
         res.json({
@@ -13,3 +13,5 @@ export const getAllCategories = async(req,res)=>{
         });
     }
 };
+
+module.exports ={getAllCategories};
