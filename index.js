@@ -7,6 +7,7 @@ const cors = require("cors");
 const productController = require("./src/product/product.controller");
 const pesanController = require("./src/pesan/pesan.controller");
 const authController = require("./src/user/auth/auth.router");
+const categoriesController = require("./src/categories/categories.controller");
 
 dotenv.config();
 const app = express();
@@ -39,6 +40,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authController);
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use("/products", productController);
+app.use("/categories",categoriesController);
 app.use("/pesan", pesanController);
 
 app.listen(PORT, () => {
